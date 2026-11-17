@@ -168,45 +168,36 @@
     font-weight: 700;
   }
 
-  .student-grid {
+  .exam-meta-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr 180px;
+    grid-template-columns: 1fr 1fr 1fr;
     border-top: 1px solid var(--border-dark);
+    background: #f8fafc;
   }
 
-  .student-cell {
+  .exam-meta-cell {
     padding: 10px 14px;
     border-right: 1px solid var(--border-dark);
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
   }
 
-  .student-cell:last-child {
+  .exam-meta-cell:last-child {
     border-right: none;
-    background: #f8fafc;
-    justify-content: center;
   }
 
-  .student-cell label {
+  .exam-meta-cell .meta-label {
     font-size: 0.75rem;
     font-weight: 700;
     text-transform: uppercase;
     color: var(--muted);
   }
 
-  .student-cell input {
-    border: none;
-    border-bottom: 1.5px solid #94a3b8;
-    padding: 4px 2px;
-    font-size: 0.95rem;
-    font-family: inherit;
-    background: transparent;
-  }
-
-  .student-cell input:focus {
-    outline: none;
-    border-bottom-color: var(--accent);
+  .exam-meta-cell .meta-value {
+    font-size: 1.02rem;
+    font-weight: 700;
+    color: var(--ink);
   }
 
   .instructions-box {
@@ -508,12 +499,15 @@
       padding: 20px 16px;
       margin: 12px;
     }
-    .student-grid {
+    .exam-meta-grid {
       grid-template-columns: 1fr;
     }
-    .student-cell {
+    .exam-meta-cell {
       border-right: none;
       border-bottom: 1px solid var(--border-dark);
+    }
+    .exam-meta-cell:last-child {
+      border-bottom: none;
     }
     .diagram-box, .subq {
       margin-left: 0;
@@ -566,18 +560,18 @@
         <div class="topic">Potential Difference &amp; Voltage Ratios in Circuits</div>
       </div>
     </div>
-    <div class="student-grid">
-      <div class="student-cell">
-        <label for="student-name">Student Name</label>
-        <input type="text" id="student-name" placeholder="Enter your full name" oninput="saveState()" />
+    <div class="exam-meta-grid">
+      <div class="exam-meta-cell">
+        <span class="meta-label">Time Allowed</span>
+        <span class="meta-value">35 minutes</span>
       </div>
-      <div class="student-cell">
-        <label for="student-class">Class / Teacher</label>
-        <input type="text" id="student-class" placeholder="e.g. 10P1 / Dr Smith" oninput="saveState()" />
+      <div class="exam-meta-cell">
+        <span class="meta-label">Materials</span>
+        <span class="meta-value">Calculator &bull; Ruler</span>
       </div>
-      <div class="student-cell">
-        <label>Total Marks</label>
-        <div style="font-size:1.15rem; font-weight:800;">31 Marks <span style="font-size:0.8rem; font-weight:500; color:#4b5563;">(35 mins)</span></div>
+      <div class="exam-meta-cell">
+        <span class="meta-label">Total Marks</span>
+        <span class="meta-value">31 Marks</span>
       </div>
     </div>
   </header>
@@ -1592,7 +1586,7 @@
 </main>
 
 <script>
-  const STORAGE_KEY = "aqa_pd_worksheet_v1";
+  const STORAGE_KEY = "aqa_pd_worksheet_v2";
 
   const QUESTIONS = [
     {
@@ -1872,7 +1866,6 @@
 
   function parseNumericAnswer(raw) {
     if (!raw || typeof raw !== "string") return NaN;
-    // Strip common units like V, volts, ohm, ohms, Ω, spaces
     const cleaned = raw
       .trim()
       .replace(/volts?|ohms?|Ω|v/gi, "")
@@ -1949,7 +1942,6 @@
     document.getElementById("top-score").textContent = `${totalEarned} / ${totalPossible}`;
     document.getElementById("top-pct").textContent = `(${pct}%)`;
 
-    // Render summary panel
     const summaryPanel = document.getElementById("summary-panel");
     summaryPanel.classList.add("visible");
     document.getElementById("summary-headline").innerHTML =
@@ -1988,8 +1980,6 @@
 
   function saveState() {
     const state = {
-      name: document.getElementById("student-name").value,
-      studentClass: document.getElementById("student-class").value,
       inputs: {},
       checks: {}
     };
@@ -2012,8 +2002,6 @@
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return;
       const state = JSON.parse(raw);
-      if (state.name) document.getElementById("student-name").value = state.name;
-      if (state.studentClass) document.getElementById("student-class").value = state.studentClass;
       if (state.inputs) {
         Object.entries(state.inputs).forEach(([qid, val]) => {
           const el = document.getElementById("in-" + qid);
@@ -2034,8 +2022,6 @@
     try {
       localStorage.removeItem(STORAGE_KEY);
     } catch (e) {}
-    document.getElementById("student-name").value = "";
-    document.getElementById("student-class").value = "";
     QUESTIONS.forEach((q) => {
       const box = document.getElementById("subq-" + q.id);
       const badge = document.getElementById("badge-" + q.id);
